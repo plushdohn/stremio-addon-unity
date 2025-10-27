@@ -4,4 +4,14 @@ Very WIP addon to fetch the catalog and streams from [AnimeUnity](https://www.an
 
 ## Adding to Stremio
 
-On [Stremio Web](https://web.stremio.com) go to "Addons", click "Add Addon" and paste this link https://stremio-unity.vercel.app/manifest.json.
+On [Stremio Web](https://web.stremio.com), go to "Addons", click "Add Addon" and paste this link:
+
+```
+https://stremio-unity.vercel.app/manifest.json
+```
+
+## Usage
+
+When you'll search something in Stremio at the bottom of the results you will see a new "Unity" catalog, and you can access content from there.
+
+Note that results may take a few seconds longer to appear compared to the native Stremio catalog.
