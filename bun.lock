@@ -4,7 +4,7 @@
     "": {
       "name": "stremio-addon-unity",
       "dependencies": {
-        "stremio-rewired": "0.0.8",
+        "stremio-rewired": "0.0.9",
         "zod": "4.1.12",
       },
       "devDependencies": {
@@ -176,7 +176,7 @@
 
     "srvx": ["srvx@0.8.16", "", { "bin": { "srvx": "bin/srvx.mjs" } }, "sha512-hmcGW4CgroeSmzgF1Ihwgl+Ths0JqAJ7HwjP2X7e3JzY7u4IydLMcdnlqGQiQGUswz+PO9oh/KtCpOISIvs9QQ=="],
 
-    "stremio-rewired": ["stremio-rewired@0.0.8", "", { "dependencies": { "consola": "^3.4.2", "open": "^10.2.0" } }, "sha512-7TVPc3N2AxvYDEkUC95j544OBIO+W7XrsBmegqTMZuUFBsMeAi4Nv+w8p3u5VVAf4Yjm4Ii0T19qqvi8QOrFBg=="],
+    "stremio-rewired": ["stremio-rewired@0.0.9", "", { "dependencies": { "consola": "^3.4.2", "open": "^10.2.0" } }, "sha512-rHYe/+3ZH1zeI2EFdWnhl4LPbaTh/jH7MDW0+BNhFeBq+d6D3lMMI7fyxmqX1iWERtM4fINYRn5RHnAQ5ohKJw=="],
 
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
