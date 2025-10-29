@@ -3,11 +3,11 @@ import { launch } from "stremio-rewired";
 import { Worker } from "alchemy/cloudflare";
 import { CloudflareStateStore } from "alchemy/state";
 
-const app = await alchemy("stremio-unity-addon", {
+const app = await alchemy("unity", {
   stateStore: (scope) => new CloudflareStateStore(scope),
 });
 
-await Worker("main-worker", {
+await Worker("worker", {
   entrypoint: "./src/worker.ts",
 });
 
