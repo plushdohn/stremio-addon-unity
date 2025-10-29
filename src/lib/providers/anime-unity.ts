@@ -1,7 +1,7 @@
 import z from "zod";
-import { CatalogItem } from "stremio-rewired";
+import type { CatalogItem } from "stremio-rewired";
 
-import { Provider } from "./interface";
+import type { Provider } from "./interface.js";
 
 interface AnimeUnityVideo {
   id: number;
@@ -124,8 +124,8 @@ export class AnimeUnityProvider implements Provider {
 
     const matches = html.matchAll(regex);
 
-    let rawDetails: string;
-    let rawEpisodes: string;
+    let rawDetails: string | null = null;
+    let rawEpisodes: string | null = null;
 
     for (const match of matches) {
       if (match[1] && match[2]) {
@@ -187,7 +187,7 @@ export class AnimeUnityProvider implements Provider {
   private getXsrfToken(response: Response) {
     const cookies = response.headers.get("Set-Cookie");
 
-    const xsrfToken = cookies.match(/XSRF-TOKEN=([^;]+)/)?.[1];
+    const xsrfToken = cookies?.match(/XSRF-TOKEN=([^;]+)/)?.[1];
 
     if (!xsrfToken) {
       throw new Error("XSRF token not found");
@@ -199,7 +199,7 @@ export class AnimeUnityProvider implements Provider {
   private getSessionCookie(response: Response) {
     const cookies = response.headers.get("Set-Cookie");
 
-    const sessionCookie = cookies.match(/animeunity_session=([^;]+)/)?.[1];
+    const sessionCookie = cookies?.match(/animeunity_session=([^;]+)/)?.[1];
 
     if (!sessionCookie) {
       throw new Error("Session cookie not found");
@@ -207,23 +207,6 @@ export class AnimeUnityProvider implements Provider {
 
     return decodeURIComponent(sessionCookie);
   }
-}
-
-async function getProxy() {
-  const response = await fetch(
-    "https://api.proxyscrape.com/v4/free-proxy-list/get?request=displayproxies&protocol=socks5&timeout=10000&country=all&ssl=yes&anonymity=yes&skip=0&limit=10"
-  );
-
-  const text = await response.text();
-
-  const lines = text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const proxy = lines[Math.floor(Math.random() * lines.length)];
-
-  return proxy;
 }
 
 function extractVixcloudUrl(htmlText: string) {
@@ -247,7 +230,7 @@ function getMp4UrlFromVixResponse(html: string) {
   const url = match?.[1];
 
   if (!url) {
-    throw new Error("Mp4 URL not found");
+    throw new Error("Mp4 URL not found in page");
   }
 
   return url;

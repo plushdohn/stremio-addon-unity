@@ -7,7 +7,7 @@ Very WIP addon to fetch the catalog and streams from [AnimeUnity](https://www.an
 On [Stremio Web](https://web.stremio.com), go to "Addons", click "Add Addon" and paste this link:
 
 ```
-https://stremio-unity.vercel.app/manifest.json
+https://unity-worker.plushdohn.workers.dev/manifest.json
 ```
 
 ## Usage
