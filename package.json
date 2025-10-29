@@ -8,7 +8,7 @@
   "dependencies": {
     "hono": "^4.10.3",
     "https-proxy-agent": "^7.0.6",
-    "stremio-rewired": "0.0.10",
+    "stremio-rewired": "0.1.0",
     "zod": "4.1.12"
   },
   "devDependencies": {

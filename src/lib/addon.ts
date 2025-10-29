@@ -28,8 +28,8 @@ export function createAddonHandler(proxyBase: string) {
       resources: ["stream", "catalog", "meta"],
       types: ["series"],
     },
-    onCatalogRequest: async (type, id, search) => {
-      const records = await provider.search(search || "");
+    onCatalogRequest: async (type, id, extra) => {
+      const records = await provider.search(extra?.search || "");
 
       return {
         metas: records.map((record) => ({

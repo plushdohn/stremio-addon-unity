@@ -31,7 +31,7 @@ app.get("/_internal/stream-proxy/:url", async (c) => {
 app.get("*", async (c) => {
   const url = new URL(c.req.url);
 
-  const proxyBase = `${url.protocol}//${url.hostname}/_internal/stream-proxy/`;
+  const proxyBase = `${url.origin}/_internal/stream-proxy/`;
 
   const response = await createAddonHandler(proxyBase)(c.req.raw);
 

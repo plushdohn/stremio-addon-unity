@@ -6,7 +6,7 @@
       "dependencies": {
         "hono": "^4.10.3",
         "https-proxy-agent": "^7.0.6",
-        "stremio-rewired": "0.0.10",
+        "stremio-rewired": "0.1.0",
         "zod": "4.1.12",
       },
       "devDependencies": {
@@ -539,7 +539,7 @@
 
     "stoppable": ["stoppable@1.1.0", "", {}, "sha512-KXDYZ9dszj6bzvnEMRYvxgeTHU74QBFL54XKtP3nyMuJ81CFYtABZ3bAzL2EdFUaEwJOBOgENyFj3R7oTzDyyw=="],
 
-    "stremio-rewired": ["stremio-rewired@0.0.10", "", { "dependencies": { "consola": "^3.4.2", "open": "^10.2.0" } }, "sha512-1mDbc8IkYjuf0zk0zjZ1p+mi34O74gqf5GkJ8mZd3ORsE31r6CG/eUmNzbQRIegPngwIKGTPxfTsFrS8prAoRA=="],
+    "stremio-rewired": ["stremio-rewired@0.1.0", "", { "dependencies": { "consola": "^3.4.2", "open": "^10.2.0" } }, "sha512-kABJgPqqYRsvL73b4t1dTesp9LV2jbmOpxSzquQKJUWFGtAODLJ8c7E/eD0RVHRMnGpeAINJjtDXuw5GOgq7ng=="],
 
     "string-width": ["string-width@5.1.2", "", { "dependencies": { "eastasianwidth": "^0.2.0", "emoji-regex": "^9.2.2", "strip-ansi": "^7.0.1" } }, "sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA=="],
 
