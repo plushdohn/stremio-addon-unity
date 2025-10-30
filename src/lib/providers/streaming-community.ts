@@ -4,22 +4,6 @@ import type { CatalogItem } from "stremio-rewired";
 
 import type { Provider } from "./interface.js";
 
-interface SCSearchResult {
-  id: number;
-  slug: string;
-  name: string;
-  type: string;
-  score?: string;
-  sub_ita?: number;
-  last_air_date?: string;
-  age?: number;
-  seasons_count: number;
-  images: Array<{
-    type: "poster" | "background";
-    filename: string;
-  }>;
-}
-
 const BASE_CDN_URL = "https://cdn.streamingcommunityz.ch";
 
 export class StreamingCommunityProvider implements Provider {
@@ -159,13 +143,179 @@ export class StreamingCommunityProvider implements Provider {
   }
 
   async getMeta(id: string): Promise<CatalogItem> {
-    const numericId = extractNumericId(id);
+    // Extract id and slug from format like "8451-poirot"
+    const idPart = (id && typeof id === "string" && id.split("--")[0]) || "";
+    const [numericId, ...slugParts] = idPart.split("-");
+    const slug = slugParts.join("-");
 
-    return {
-      id: `sc${numericId}`,
-      name: "StreamingCommunity",
-      type: "movie",
-    } as CatalogItem;
+    if (!numericId || !slug) {
+      throw new Error("Invalid ID format");
+    }
+
+    const titleSlug = `${numericId}-${slug}`;
+
+    // Get XSRF token and session cookie
+    const homeResponse = await fetch("https://streamingcommunityz.ch/");
+    const xsrfToken = this.getXsrfToken(homeResponse);
+    const sessionCookie = this.getSessionCookie(homeResponse);
+    const inertiaVersion = await this.getInertiaVersion(homeResponse);
+
+    const cookieToSend = `XSRF-TOKEN=${xsrfToken}; streamingcommunity_session=${sessionCookie};`;
+
+    const response = await fetch(
+      `https://streamingcommunityz.ch/it/titles/${titleSlug}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-xsrf-token": xsrfToken,
+          Cookie: cookieToSend,
+          "X-Requested-With": "XMLHttpRequest",
+          "X-Inertia": "true",
+          "X-Inertia-Version": inertiaVersion,
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      throw new Error(
+        `Failed to fetch title metadata, status: ${response.status}`
+      );
+    }
+
+    const json = await response.json().catch((error) => {
+      console.error("Meta request returned invalid JSON", error);
+      throw new Error("Invalid JSON response");
+    });
+
+    const titleSchema = z.object({
+      id: z.number(),
+      name: z.string(),
+      slug: z.string(),
+      plot: z.string().nullable(),
+      type: z.string(),
+      release_date: z.string().nullable(),
+      last_air_date: z.string().nullable(),
+      score: z.string().nullable(),
+      images: z.array(
+        z.object({
+          type: z.string(),
+          filename: z.string(),
+        })
+      ),
+      seasons: z
+        .array(
+          z.object({
+            id: z.number(),
+            number: z.number(),
+            name: z.string().nullable(),
+            plot: z.string().nullable(),
+            release_date: z.string().nullable(),
+            episodes_count: z.number(),
+            episodes: z
+              .array(
+                z.object({
+                  id: z.number(),
+                  number: z.string(),
+                  name: z.string().nullable(),
+                  plot: z.string().nullable(),
+                  release_date: z.string().nullable(),
+                })
+              )
+              .optional(),
+          })
+        )
+        .optional(),
+    });
+
+    const metaSchema = z.object({
+      props: z.object({
+        title: titleSchema,
+      }),
+    });
+
+    try {
+      const data = metaSchema.parse(json);
+      const title = data.props.title;
+
+      const posterImage = title.images.find((image) => image.type === "poster");
+      const backgroundImage = title.images.find(
+        (image) => image.type === "background"
+      );
+
+      const baseMeta: CatalogItem = {
+        id: `sc${title.id}-${title.slug}`,
+        name: title.name,
+        type: title.type === "tv" ? "series" : "movie",
+        poster: posterImage
+          ? `${BASE_CDN_URL}/images/${posterImage.filename}`
+          : undefined,
+        background: backgroundImage
+          ? `${BASE_CDN_URL}/images/${backgroundImage.filename}`
+          : undefined,
+        description: title.plot || undefined,
+      };
+
+      // For series, add videos (episodes)
+      if (title.type === "tv" && title.seasons) {
+        const videos: Array<{
+          id: string;
+          title: string;
+          released: string;
+          episode: number;
+          season: number;
+        }> = [];
+
+        for (const season of title.seasons) {
+          // If episodes are included in the response, use them
+          if (season.episodes && season.episodes.length > 0) {
+            for (const episode of season.episodes) {
+              const releaseDate = episode.release_date
+                ? new Date(episode.release_date).toISOString()
+                : title.release_date
+                ? new Date(title.release_date).toISOString()
+                : new Date().toISOString();
+
+              videos.push({
+                id: `sc${title.id}-${title.slug}--${season.number}-${episode.number}`,
+                title: episode.name || `Episodio ${episode.number}`,
+                released: releaseDate,
+                episode: Number.parseInt(episode.number) || 0,
+                season: season.number,
+              });
+            }
+          } else {
+            // If episodes are not included, create placeholder entries based on episodes_count
+            const releaseDate = season.release_date
+              ? new Date(season.release_date).toISOString()
+              : title.release_date
+              ? new Date(title.release_date).toISOString()
+              : new Date().toISOString();
+
+            for (let i = 1; i <= season.episodes_count; i++) {
+              videos.push({
+                id: `sc${title.id}-${title.slug}--${season.number}-${String(
+                  i
+                )}`,
+                title: `Episodio ${i}`,
+                released: releaseDate,
+                episode: i,
+                season: season.number,
+              });
+            }
+          }
+        }
+
+        return {
+          ...baseMeta,
+          videos,
+        };
+      }
+
+      return baseMeta;
+    } catch (error) {
+      console.error("Meta request returned invalid data:", error);
+      throw new Error("Failed to parse title metadata");
+    }
   }
 
   private getXsrfToken(response: Response) {
