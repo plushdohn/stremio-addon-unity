@@ -6,7 +6,6 @@
     "dev": "nitro dev"
   },
   "dependencies": {
-    "arkregex": "^0.0.2",
     "hono": "^4.10.3",
     "m3u8-parser": "^7.2.0",
     "stremio-rewired": "0.1.0",
