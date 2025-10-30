@@ -1,6 +1,6 @@
 import z from "zod";
 import * as m3u8Parser from "m3u8-parser";
-import type { CatalogItem } from "stremio-rewired";
+import type { CatalogItem, Stream } from "stremio-rewired";
 
 import type { Provider } from "./interface.js";
 
@@ -81,9 +81,7 @@ export class StreamingCommunityProvider implements Provider {
     }
   }
 
-  async getStreams(
-    id: string
-  ): Promise<Array<{ id: string; title: string; url: string }>> {
+  async getStreams(id: string): Promise<Array<Stream>> {
     const numericId = extractNumericId(id);
 
     const response = await fetch(
@@ -131,13 +129,19 @@ export class StreamingCommunityProvider implements Provider {
       response.text()
     );
 
-    const streamUrl = extractM3u8UrlFromPlaylist(playlistText);
+    const streamUrlRaw = extractM3u8UrlFromPlaylist(playlistText);
+
+    const [streamUrlBase, streamUrlParams] = streamUrlRaw.split("?");
+
+    const streamUrl = `${streamUrlBase}.m3u8?${streamUrlParams}`;
 
     return [
       {
-        id: `sc${numericId}`,
         title: "Stream",
-        url: `${streamUrl}#.m3u8`,
+        url: streamUrl,
+        behaviorHints: {
+          notWebReady: true,
+        },
       },
     ];
   }

@@ -9,7 +9,7 @@ export function createAddonHandler(proxyBase: string) {
   return createHandler({
     manifest: {
       id: "org.stremio.unity",
-      version: "0.0.5",
+      version: "0.0.6",
       name: "Unity",
       catalogs: [
         {

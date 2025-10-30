@@ -1,9 +1,7 @@
-import { ContentType } from "stremio-rewired";
+import { type ContentType, type Stream } from "stremio-rewired";
 
 export interface Provider {
-  getStreams: (
-    id: string
-  ) => Promise<Array<{ id: string; title: string; url: string }>>;
+  getStreams: (id: string) => Promise<Array<Stream>>;
   search: (
     title: string
   ) => Promise<{ title: string; id: string; imageUrl?: string }[]>;
