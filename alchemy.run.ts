@@ -9,6 +9,7 @@ const app = await alchemy("unity", {
 
 await Worker("worker", {
   entrypoint: "./src/worker.ts",
+  compatibility: process.env.CI ? undefined : "node",
 });
 
 await app.finalize();
